@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquivos compartilhados</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; color: #222; }
+  li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eee; }
+  ul { list-style: none; padding: 0; }
+  a { color: #3b82f6; white-space: nowrap; }
+  small { color: #777; }
+</style>
+</head>
+<body>
+<h1>Arquivos compartilhados</h1>
+<p id="status">Carregando…</p>
+<ul id="list"></ul>
+
+<script>
+const fmt = (b) => b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const id = new URLSearchParams(location.search).get('id');
+
+fetch('/api/list?id=' + encodeURIComponent(id || ''))
+  .then((r) => r.ok ? r.json() : Promise.reject())
+  .then((files) => {
+    document.getElementById('status').textContent = files.length ? `${files.length} arquivo(s)` : 'Pasta vazia ou não encontrada.';
+    document.getElementById('list').innerHTML = files.map((f) =>
+      `<li><span>${esc(f.name)} <small>${fmt(f.size)}</small></span>
+       <span><a href="${f.url}" target="_blank">Abrir</a> · <a href="${f.downloadUrl}">Baixar</a></span></li>`
+    ).join('');
+  })
+  .catch(() => { document.getElementById('status').textContent = 'Link inválido.'; });
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@
   .drop {
     width: 100%; min-height: 176px; padding: var(--s-5) var(--s-4);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s-2);
-    border: 2px dashed var(--c-border); border-radius: var(--r-lg);
+    border: 2px dashed var(--c-border-strong); border-radius: var(--r-lg);
     background: var(--c-surface); color: var(--c-text); cursor: pointer; text-align: center;
     transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur-fast) var(--ease);
     -webkit-tap-highlight-color: transparent;
@@ -40,13 +40,13 @@
 
   .action-bar {
     position: sticky; bottom: 0; z-index: 5;
-    margin: 0 calc(-1 * var(--gutter)); padding: var(--s-3) var(--gutter) calc(var(--s-3) + env(safe-area-inset-bottom));
+    margin: var(--s-4) calc(-1 * var(--gutter)) 0; padding: var(--s-3) var(--gutter) calc(var(--s-3) + env(safe-area-inset-bottom));
     background: linear-gradient(to bottom, transparent, var(--c-bg) 24%);
   }
   .overall { margin-top: var(--s-2); }
   .overall-text { display: flex; justify-content: space-between; font-size: var(--fs-sm); color: var(--c-text-muted); margin-top: var(--s-2); gap: var(--s-2); }
   .overall-text span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
-  @media (min-width: 640px) { .action-bar { position: static; margin: 0; padding: 0; background: none; } }
+  @media (min-width: 640px) { .action-bar { position: static; margin: var(--s-4) 0 0; padding: 0; background: none; } }
 
   .result { text-align: center; }
   .result h2 { font-size: var(--fs-xl); outline: none; }
@@ -56,7 +56,7 @@
   .link-field { display: flex; gap: var(--s-2); align-items: stretch; margin-bottom: var(--s-3); }
   .link-field input {
     flex: 1; min-width: 0; min-height: var(--tap); padding: 0 var(--s-3);
-    border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-2);
+    border: 1px solid var(--c-border-strong); border-radius: var(--r-md); background: var(--c-surface-2);
     font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--c-text);
   }
   .result .btn-row > .btn { padding: 0 var(--s-3); white-space: nowrap; flex-basis: 128px; }
@@ -135,7 +135,7 @@
           Baixar QR code
         </a>
       </div>
-      <a id="open" class="btn btn-ghost" target="_blank" rel="noopener">Abrir página da pasta</a>
+      <a id="open" class="btn btn-secondary" target="_blank" rel="noopener">Abrir página da pasta</a>
       <button type="button" id="reset" class="btn btn-ghost">Enviar outros arquivos</button>
     </div>
   </section>
@@ -365,7 +365,10 @@ async function showResult(id) {
   $('result-sub').textContent = `${plural(done.length, 'arquivo enviado', 'arquivos enviados')} · ${fmt(done.reduce((s, it) => s + it.file.size, 0))}`;
   $('link').value = link;
   $('open').href = link;
-  $('share').hidden = typeof navigator.share !== 'function';
+  const canShare = typeof navigator.share === 'function';
+  $('share').hidden = !canShare;
+  $('copy').classList.toggle('btn-primary', !canShare);
+  $('copy').classList.toggle('btn-secondary', canShare);
   $('upload').hidden = true;
   $('result').hidden = false;
   window.scrollTo({ top: 0 });

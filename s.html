@@ -19,7 +19,7 @@
   .row-actions { display: flex; gap: var(--s-1); flex: none; }
   .row-actions .btn { padding: 0 var(--s-3); }
   .row-actions .btn svg { width: 18px; height: 18px; }
-  @media (max-width: 420px) {
+  @media (max-width: 520px) {
     .row { flex-wrap: wrap; }
     .row .file-body { flex: 1 1 0; }
     .row-actions { width: 100%; }
@@ -63,7 +63,7 @@
   </div>
 
   <ul id="list" class="files" aria-label="Arquivos da pasta"></ul>
-  <div id="state" class="card empty" hidden></div>
+  <div id="state" class="card empty" role="status" hidden></div>
 </main>
 
 <footer class="wrap app-footer"><a href="/">Envie seus próprios arquivos com o QR-CODE app</a>
@@ -104,7 +104,7 @@ function showState(icon, title, text, action) {
   $('list').innerHTML = '';
   $('all-wrap').hidden = true;
   $('main').setAttribute('aria-busy', 'false');
-  $('summary').textContent = title;
+  $('summary').textContent = '';
   $('state').hidden = false;
   $('state').innerHTML = `<div class="empty-icon" aria-hidden="true">${icon}</div><h2>${esc(title)}</h2><p>${esc(text)}</p>${action || ''}`;
 }
@@ -132,7 +132,7 @@ function render() {
       </div>
       <div class="row-actions">
         <a class="btn btn-secondary btn-sm" href="${esc(safeUrl(f.url))}" target="_blank" rel="noopener" aria-label="Abrir ${esc(f.name)}">${OPEN_ICON}Abrir</a>
-        <a class="btn btn-primary btn-sm" href="${esc(safeUrl(f.downloadUrl))}" aria-label="Baixar ${esc(f.name)}">${DL_ICON}Baixar</a>
+        <a class="btn btn-secondary btn-sm" href="${esc(safeUrl(f.downloadUrl))}" aria-label="Baixar ${esc(f.name)}">${DL_ICON}Baixar</a>
       </div>
     </li>`).join('');
 }

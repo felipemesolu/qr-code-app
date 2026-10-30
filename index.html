@@ -188,7 +188,8 @@ function assignNames() {
   for (const it of state.items) if (it.frozen) used.add(it.name.toLowerCase());
   for (const it of state.items) {
     if (it.frozen || it.status === 'rejected') continue;
-    const base = it.file.name.replace(/[\/\\]/g, '_') || 'arquivo';
+    // O Vercel Blob rejeita caminhos com acentos/não-ASCII, então normalizamos o nome
+    const base = it.file.name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w .()\-]/g, '_') || 'arquivo';
     const dot = base.lastIndexOf('.');
     const stem = dot > 0 ? base.slice(0, dot) : base;
     const ext = dot > 0 ? base.slice(dot) : '';
@@ -254,9 +255,10 @@ function render() {
   const queue = pending();
   const hasError = queue.some((it) => it.status === 'error');
   const send = $('send');
-  send.disabled = busy || !queue.length;
+  const canFinish = !queue.length && state.folderId && items.some((it) => it.status === 'done');
+  send.disabled = busy || (!queue.length && !canFinish);
   send.setAttribute('aria-busy', String(busy));
-  $('send-label').textContent = busy ? 'Enviando…' : hasError ? 'Tentar novamente' : queue.length ? `Enviar ${plural(queue.length, 'arquivo', 'arquivos')} e gerar QR code` : 'Enviar e gerar QR code';
+  $('send-label').textContent = busy ? 'Enviando…' : hasError ? 'Tentar novamente' : queue.length ? `Enviar ${plural(queue.length, 'arquivo', 'arquivos')} e gerar QR code` : canFinish ? 'Gerar QR code' : 'Enviar e gerar QR code';
   send.querySelector('.spinner')?.remove();
   if (busy) send.insertAdjacentHTML('afterbegin', '<span class="spinner" aria-hidden="true"></span>');
   $('overall').hidden = !busy;
@@ -297,7 +299,11 @@ const makeId = () => Array.from(crypto.getRandomValues(new Uint8Array(10)), (n) 
 
 async function send() {
   const queue = pending();
-  if (state.busy || !queue.length) return;
+  if (state.busy) return;
+  if (!queue.length) {
+    if (state.folderId && state.items.some((it) => it.status === 'done')) showResult(state.folderId);
+    return;
+  }
   assignNames();
   for (const it of queue) { it.frozen = true; it.status = 'ready'; it.progress = 0; it.error = ''; }
   state.busy = true;
@@ -439,8 +445,6 @@ $('selected').addEventListener('click', (e) => {
   announce(`${removed.name} removido.`);
   const next = $('selected').querySelectorAll('[data-remove]')[Math.min(idx, $('selected').querySelectorAll('[data-remove]').length - 1)];
   (next || drop).focus();
-  // Se só restaram arquivos já enviados, gera o QR code
-  if (!pending().length && state.items.some((it) => it.status === 'done') && state.folderId) showResult(state.folderId);
 });
 
 $('send').addEventListener('click', send);

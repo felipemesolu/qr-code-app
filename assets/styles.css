@@ -155,13 +155,7 @@ main { padding-bottom: var(--s-7); }
 .ftype svg { width: 20px; height: 20px; margin-top: -10px; }
 .ftype span { position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; color: color-mix(in srgb, var(--k) 70%, var(--c-text)); }
 .ftype img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: var(--c-surface-2); }
-.ftype[data-kind="image"] { --k: var(--k-image); }
-.ftype[data-kind="video"] { --k: var(--k-video); }
-.ftype[data-kind="audio"] { --k: var(--k-audio); }
 .ftype[data-kind="pdf"] { --k: var(--k-pdf); }
-.ftype[data-kind="doc"] { --k: var(--k-doc); }
-.ftype[data-kind="sheet"] { --k: var(--k-sheet); }
-.ftype[data-kind="zip"] { --k: var(--k-zip); }
 
 /* Listas de arquivos */
 .file-list { list-style: none; margin: 0; padding: 0; }

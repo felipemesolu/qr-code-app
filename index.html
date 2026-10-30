@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR-CODE app · Envie arquivos e compartilhe por QR code</title>
-<meta name="description" content="Envie arquivos e compartilhe a pasta com um QR code.">
+<title>QR-CODE app · Envie um PDF e compartilhe por QR code</title>
+<meta name="description" content="Envie um PDF e compartilhe com um QR code que abre o arquivo direto no celular.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e1020" media="(prefers-color-scheme: dark)">
@@ -34,18 +34,13 @@
   .t-fine { display: none; }
   @media (hover: hover) and (pointer: fine) { .t-fine { display: inline; } .t-touch { display: none; } }
 
-  .list-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--s-2); margin-bottom: var(--s-1); }
-  .list-head h2 { font-size: var(--fs-md); }
-  .list-head span { color: var(--c-text-muted); font-size: var(--fs-sm); }
+  .selected-card .file { padding: 0; }
 
   .action-bar {
     position: sticky; bottom: 0; z-index: 5;
     margin: var(--s-4) calc(-1 * var(--gutter)) 0; padding: var(--s-3) var(--gutter) calc(var(--s-3) + env(safe-area-inset-bottom));
     background: linear-gradient(to bottom, transparent, var(--c-bg) 24%);
   }
-  .overall { margin-top: var(--s-2); }
-  .overall-text { display: flex; justify-content: space-between; font-size: var(--fs-sm); color: var(--c-text-muted); margin-top: var(--s-2); gap: var(--s-2); }
-  .overall-text span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
   @media (min-width: 640px) { .action-bar { position: static; margin: var(--s-4) 0 0; padding: 0; background: none; } }
 
   .result { text-align: center; }
@@ -79,22 +74,18 @@
 <main id="main" class="wrap">
   <section id="upload" aria-labelledby="upload-title" class="stack">
     <div>
-      <h1 id="upload-title" class="title">Envie e compartilhe por QR code</h1>
-      <p class="lead">Escolha os arquivos, envie e mostre o QR code. Quem escanear acessa a pasta.</p>
+      <h1 id="upload-title" class="title">Envie um PDF e compartilhe por QR code</h1>
+      <p class="lead">Quem escanear o QR code abre o PDF direto no celular.</p>
     </div>
 
-    <input type="file" id="files" multiple class="sr-only" tabindex="-1" aria-hidden="true">
+    <input type="file" id="files" accept="application/pdf,.pdf" class="sr-only" tabindex="-1" aria-hidden="true">
     <button type="button" class="drop" id="drop" aria-describedby="drop-hint">
       <span class="drop-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg></span>
-      <strong id="drop-label"><span class="t-touch">Toque para escolher arquivos</span><span class="t-fine">Clique ou arraste arquivos aqui</span></strong>
-      <small id="drop-hint">Até 50 MB por arquivo</small>
+      <strong id="drop-label"><span class="t-touch">Toque para escolher o PDF</span><span class="t-fine">Clique ou arraste o PDF aqui</span></strong>
+      <small id="drop-hint">Apenas 1 arquivo PDF · até 50 MB</small>
     </button>
 
-    <div id="selected-card" class="card" hidden>
-      <div class="list-head">
-        <h2>Arquivos selecionados</h2>
-        <span id="summary"></span>
-      </div>
+    <div id="selected-card" class="card selected-card" hidden>
       <ul id="selected" class="file-list"></ul>
     </div>
 
@@ -102,22 +93,18 @@
 
     <div class="action-bar">
       <button type="button" id="send" class="btn btn-primary btn-block" disabled>
-        <span id="send-label">Enviar e gerar QR code</span>
+        <span id="send-label">Enviar PDF e gerar QR code</span>
       </button>
-      <div id="overall" class="overall" hidden>
-        <div class="progress" role="progressbar" aria-label="Progresso total do envio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="overall-bar"></i></div>
-        <div class="overall-text"><span id="overall-file"></span><span id="overall-pct">0%</span></div>
-      </div>
     </div>
   </section>
 
   <section id="result" class="result card fade-in" aria-labelledby="result-title" hidden>
     <div class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-    <h2 id="result-title" tabindex="-1">Pronto! Sua pasta está no ar</h2>
+    <h2 id="result-title" tabindex="-1">Pronto! Seu PDF está no ar</h2>
     <p class="lead" id="result-sub"></p>
-    <div class="qr-frame"><img id="qr" alt="QR code que abre a pasta compartilhada" width="296" height="296"></div>
+    <div class="qr-frame"><img id="qr" alt="QR code que abre o PDF compartilhado" width="296" height="296"></div>
     <div class="link-field">
-      <label for="link" class="sr-only">Link da pasta</label>
+      <label for="link" class="sr-only">Link do PDF</label>
       <input type="text" id="link" readonly>
     </div>
     <div class="result-actions">
@@ -135,15 +122,15 @@
           Baixar QR code
         </a>
       </div>
-      <a id="open" class="btn btn-secondary" target="_blank" rel="noopener">Abrir página da pasta</a>
-      <button type="button" id="reset" class="btn btn-ghost">Enviar outros arquivos</button>
+      <a id="open" class="btn btn-secondary" target="_blank" rel="noopener">Abrir PDF</a>
+      <button type="button" id="reset" class="btn btn-ghost">Enviar outro PDF</button>
     </div>
   </section>
 
   <p id="status" class="sr-only" role="status" aria-live="polite"></p>
 </main>
 
-<footer class="wrap app-footer">Os arquivos ficam acessíveis a quem tiver o link.
+<footer class="wrap app-footer">O PDF fica acessível a quem tiver o link.
   <span class="app-credit">v1.0.0 <span aria-hidden="true">·</span> Desenvolvido por <a href="https://mesolu.com.br" target="_blank" rel="noopener">Felipe MESOLU</a></span>
 </footer>
 
@@ -157,138 +144,93 @@ const MAX = 50 * 1024 * 1024;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const num = (n) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
 const fmt = (b) => b < 1024 ? b + ' B' : b < 1048576 ? num(b / 1024) + ' KB' : b < 1073741824 ? num(b / 1048576) + ' MB' : num(b / 1073741824) + ' GB';
-const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-
-const KINDS = {
-  image: /^(jpe?g|png|gif|webp|avif|heic|heif|bmp|svg|tiff?)$/,
-  video: /^(mp4|mov|m4v|webm|mkv|avi|3gp)$/,
-  audio: /^(mp3|wav|m4a|aac|ogg|oga|flac|opus)$/,
-  pdf: /^pdf$/,
-  doc: /^(docx?|odt|rtf|txt|md|pages|pptx?|odp|key)$/,
-  sheet: /^(xlsx?|ods|csv|numbers)$/,
-  zip: /^(zip|rar|7z|tar|gz|tgz|bz2)$/,
-};
-const extOf = (name) => { const i = name.lastIndexOf('.'); return i > 0 ? name.slice(i + 1).toLowerCase() : ''; };
-const kindOf = (name) => { const e = extOf(name); for (const k in KINDS) if (KINDS[k].test(e)) return k; return 'other'; };
-const ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
-const typeIcon = (name) => `<span class="ftype" data-kind="${kindOf(name)}" aria-hidden="true">${ICON}<span>${esc(extOf(name).slice(0, 4))}</span></span>`;
 const X_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const FILE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+const PDF_ICON = `<span class="ftype" data-kind="pdf" aria-hidden="true">${FILE_ICON}<span>pdf</span></span>`;
 
-let state, uid = 0;
-function freshState() { state = { items: [], busy: false, folderId: null }; }
+let state;
+function freshState() { state = { item: null, busy: false, id: null }; }
 freshState();
 
 const announce = (msg) => { $('status').textContent = ''; setTimeout(() => { $('status').textContent = msg; }, 30); };
 const setError = (msg) => { $('error').textContent = msg || ''; };
-const pending = () => state.items.filter((it) => it.status === 'ready' || it.status === 'error');
+const isPdf = (f) => f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
 
-// Nomes únicos (case-insensitive) dentro do lote: "foto.jpg", "foto (2).jpg"...
-function assignNames() {
-  const used = new Set();
-  for (const it of state.items) if (it.frozen) used.add(it.name.toLowerCase());
-  for (const it of state.items) {
-    if (it.frozen || it.status === 'rejected') continue;
-    // O Vercel Blob rejeita caminhos com acentos/não-ASCII, então normalizamos o nome
-    const base = it.file.name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w .()\-]/g, '_') || 'arquivo';
-    const dot = base.lastIndexOf('.');
-    const stem = dot > 0 ? base.slice(0, dot) : base;
-    const ext = dot > 0 ? base.slice(dot) : '';
-    let name = base, n = 2;
-    while (used.has(name.toLowerCase())) name = `${stem} (${n++})${ext}`;
-    used.add(name.toLowerCase());
-    it.name = name;
-  }
+// O Vercel Blob rejeita caminhos com acentos/não-ASCII, então normalizamos o nome
+function safeName(name) {
+  const base = name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w .()\-]/g, '_').replace(/\.pdf$/i, '').trim() || 'arquivo';
+  return base + '.pdf';
 }
 
 function addFiles(list) {
   if (state.busy || !list || !list.length) return;
-  let rejected = 0;
-  for (const f of list) {
-    const tooBig = f.size > MAX;
-    if (tooBig) rejected++;
-    state.items.push({ key: ++uid, file: f, name: f.name, status: tooBig ? 'rejected' : 'ready', progress: 0, error: tooBig ? 'Maior que 50 MB' : '', frozen: false });
-  }
-  setError('');
+  const pdf = list.find(isPdf);
+  if (!pdf) { setError('Escolha um arquivo PDF.'); announce('Escolha um arquivo PDF.'); return; }
+  if (pdf.size > MAX) { setError('O PDF tem mais de 50 MB. Escolha um arquivo menor.'); announce('O PDF tem mais de 50 MB.'); return; }
+  setError(list.length > 1 ? 'Só é possível enviar 1 PDF por vez. Usamos o primeiro.' : '');
+  state.item = { file: pdf, name: safeName(pdf.name), status: 'ready', progress: 0, error: '' };
+  state.id = null; // novo arquivo, novo link
   render();
-  const added = list.length - rejected;
-  announce([added && plural(added, 'arquivo adicionado', 'arquivos adicionados'), rejected && `${plural(rejected, 'arquivo recusado', 'arquivos recusados')} por passar de 50 MB`].filter(Boolean).join('. ') + '.');
+  announce(`${state.item.name} selecionado.` + (list.length > 1 ? ' Só é possível enviar 1 PDF por vez.' : ''));
 }
 
 function metaHTML(it) {
   const parts = [`<span>${fmt(it.file.size)}</span>`];
-  if (it.status === 'rejected') parts.push(`<span class="err">Recusado: ${esc(it.error)}</span>`);
-  else if (it.status === 'uploading') parts.push(`<span>Enviando… ${Math.round(it.progress)}%</span>`);
+  if (it.status === 'uploading') parts.push(`<span>Enviando… ${Math.round(it.progress)}%</span>`);
   else if (it.status === 'done') parts.push('<span class="ok">Enviado</span>');
   else if (it.status === 'error') parts.push(`<span class="err">${esc(it.error)}</span>`);
-  if (it.name !== it.file.name && it.status !== 'rejected') parts.push(`<span>Será salvo como “${esc(it.name)}”</span>`);
+  if (it.name !== it.file.name) parts.push(`<span>Será salvo como “${esc(it.name)}”</span>`);
   return parts.join('<span aria-hidden="true">·</span>');
 }
 
 function render() {
-  assignNames();
-  const { items, busy } = state;
-  const ok = items.filter((it) => it.status !== 'rejected');
-  const rejected = items.length - ok.length;
-  $('selected-card').hidden = !items.length;
-  $('selected').innerHTML = items.map((it) => {
+  const { item: it, busy } = state;
+  $('selected-card').hidden = !it;
+  if (it) {
     const showBar = it.status === 'uploading' || it.status === 'done' || it.status === 'error';
-    const canRemove = !busy && it.status !== 'done';
-    return `<li class="file is-${it.status}" data-key="${it.key}">
-      ${typeIcon(it.file.name)}
+    $('selected').innerHTML = `<li class="file is-${it.status}">
+      ${PDF_ICON}
       <div class="file-body">
         <div class="file-name" title="${esc(it.name)}">${esc(it.name)}</div>
         <div class="file-meta">${metaHTML(it)}</div>
-        ${showBar ? `<div class="progress" aria-hidden="true"><i style="width:${it.progress}%"></i></div>` : ''}
+        ${showBar ? `<div class="progress" role="progressbar" aria-label="Progresso do envio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(it.progress)}"><i style="width:${it.progress}%"></i></div>` : ''}
       </div>
-      ${canRemove ? `<button type="button" class="icon-btn" data-remove="${it.key}" aria-label="Remover ${esc(it.name)}">${X_ICON}</button>` : ''}
+      ${busy ? '' : `<button type="button" class="icon-btn" data-remove aria-label="Remover ${esc(it.name)}">${X_ICON}</button>`}
     </li>`;
-  }).join('');
-  const total = ok.reduce((s, it) => s + it.file.size, 0);
-  $('summary').textContent = [ok.length && `${plural(ok.length, 'arquivo', 'arquivos')} · ${fmt(total)}`, rejected && plural(rejected, 'recusado', 'recusados')].filter(Boolean).join(' · ');
+  } else {
+    $('selected').innerHTML = '';
+  }
 
   const drop = $('drop');
   drop.disabled = busy;
-  drop.classList.toggle('compact', items.length > 0);
-  drop.querySelector('.t-touch').textContent = items.length ? 'Adicionar mais arquivos' : 'Toque para escolher arquivos';
-  drop.querySelector('.t-fine').textContent = items.length ? 'Adicionar mais (clique ou arraste)' : 'Clique ou arraste arquivos aqui';
+  drop.classList.toggle('compact', !!it);
+  drop.querySelector('.t-touch').textContent = it ? 'Trocar o PDF' : 'Toque para escolher o PDF';
+  drop.querySelector('.t-fine').textContent = it ? 'Trocar o PDF (clique ou arraste)' : 'Clique ou arraste o PDF aqui';
 
-  const queue = pending();
-  const hasError = queue.some((it) => it.status === 'error');
+  const hasError = !!it && it.status === 'error';
   const send = $('send');
-  const canFinish = !queue.length && state.folderId && items.some((it) => it.status === 'done');
-  send.disabled = busy || (!queue.length && !canFinish);
+  send.disabled = busy || !it;
   send.setAttribute('aria-busy', String(busy));
-  $('send-label').textContent = busy ? 'Enviando…' : hasError ? 'Tentar novamente' : queue.length ? `Enviar ${plural(queue.length, 'arquivo', 'arquivos')} e gerar QR code` : canFinish ? 'Gerar QR code' : 'Enviar e gerar QR code';
+  $('send-label').textContent = busy ? 'Enviando…' : hasError ? 'Tentar novamente' : 'Enviar PDF e gerar QR code';
   send.querySelector('.spinner')?.remove();
   if (busy) send.insertAdjacentHTML('afterbegin', '<span class="spinner" aria-hidden="true"></span>');
-  $('overall').hidden = !busy;
 }
 
 function updateItem(it) {
-  const li = $('selected').querySelector(`[data-key="${it.key}"]`);
+  const li = $('selected').querySelector('.file');
   if (!li) return;
   li.className = `file is-${it.status}`;
   li.querySelector('.file-meta').innerHTML = metaHTML(it);
-  const bar = li.querySelector('.progress > i');
-  if (bar) bar.style.width = it.progress + '%';
-}
-
-function updateOverall(queue, current, idx) {
-  const total = queue.reduce((s, it) => s + it.file.size, 0) || 1;
-  const loaded = queue.reduce((s, it) => s + (it.file.size * it.progress) / 100, 0);
-  const pct = Math.min(100, Math.round((loaded / total) * 100));
-  $('overall-bar').style.width = pct + '%';
-  $('overall').querySelector('[role=progressbar]').setAttribute('aria-valuenow', pct);
-  $('overall-pct').textContent = pct + '%';
-  if (current) $('overall-file').textContent = `${idx + 1} de ${queue.length}: ${current.name}`;
+  const bar = li.querySelector('.progress');
+  if (bar) { bar.setAttribute('aria-valuenow', Math.round(it.progress)); bar.firstElementChild.style.width = it.progress + '%'; }
 }
 
 function friendlyError(err) {
   const msg = String((err && err.message) || '');
   if (!navigator.onLine) return 'Sem conexão com a internet.';
   if (/failed to fetch|network|load failed|networkerror/i.test(msg)) return 'Falha de conexão. Verifique a internet e tente de novo.';
-  if (/already exists/i.test(msg)) return 'Já existe um arquivo com esse nome nesta pasta.';
-  if (/content.?type|not allowed/i.test(msg)) return 'Tipo de arquivo não permitido.';
+  if (/already exists/i.test(msg)) return 'Já existe um arquivo com esse nome.';
+  if (/content.?type|not allowed/i.test(msg)) return 'Tipo de arquivo não permitido. Envie um PDF.';
   if (/too large|maximum|exceeds/i.test(msg)) return 'Arquivo maior que o permitido.';
   if (/presigned|token|unauthori|forbidden|40[13]/i.test(msg)) return 'O servidor não autorizou o envio. Tente novamente em instantes.';
   const clean = msg.replace(/^Vercel Blob:\s*/i, '');
@@ -298,58 +240,38 @@ function friendlyError(err) {
 const makeId = () => Array.from(crypto.getRandomValues(new Uint8Array(10)), (n) => 'abcdefghijklmnopqrstuvwxyz0123456789'[n % 36]).join('');
 
 async function send() {
-  const queue = pending();
-  if (state.busy) return;
-  if (!queue.length) {
-    if (state.folderId && state.items.some((it) => it.status === 'done')) showResult(state.folderId);
-    return;
-  }
-  assignNames();
-  for (const it of queue) { it.frozen = true; it.status = 'ready'; it.progress = 0; it.error = ''; }
+  const it = state.item;
+  if (state.busy || !it) return;
+  it.status = 'uploading'; it.progress = 0; it.error = '';
   state.busy = true;
-  state.folderId = state.folderId || makeId();
-  const id = state.folderId;
+  state.id = state.id || makeId();
+  const id = state.id;
   setError('');
   render();
-  updateOverall(queue, queue[0], 0);
-  announce(`Enviando ${plural(queue.length, 'arquivo', 'arquivos')}.`);
+  announce('Enviando o PDF.');
 
-  let failed = 0;
-  for (const [i, it] of queue.entries()) {
-    it.status = 'uploading';
-    updateItem(it);
-    updateOverall(queue, it, i);
-    try {
-      await uploadPresigned(`pastas/${id}/${it.name}`, it.file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload',
-        onUploadProgress: ({ percentage }) => {
-          it.progress = Math.max(0, Math.min(100, percentage || 0));
-          updateItem(it);
-          updateOverall(queue, it, i);
-        },
-      });
-      it.status = 'done';
-      it.progress = 100;
-    } catch (err) {
-      failed++;
-      it.status = 'error';
-      it.progress = 100;
-      it.error = friendlyError(err);
-      if (!navigator.onLine) { // sem rede: não insiste nos demais
-        for (const rest of queue.slice(i + 1)) { rest.status = 'error'; rest.error = 'Não enviado.'; }
+  try {
+    await uploadPresigned(`pdfs/${id}/${it.name}`, it.file, {
+      access: 'public',
+      handleUploadUrl: '/api/upload',
+      contentType: 'application/pdf',
+      onUploadProgress: ({ percentage }) => {
+        it.progress = Math.max(0, Math.min(100, percentage || 0));
         updateItem(it);
-        break;
-      }
-    }
-    updateItem(it);
-    updateOverall(queue, it, i);
+      },
+    });
+    it.status = 'done';
+    it.progress = 100;
+  } catch (err) {
+    it.status = 'error';
+    it.progress = 100;
+    it.error = friendlyError(err);
   }
 
   state.busy = false;
   render();
-  if (failed) {
-    const msg = failed === queue.length && failed === 1 ? queue[0].error : `${plural(failed, 'arquivo não foi enviado', 'arquivos não foram enviados')}. Remova-os ou toque em “Tentar novamente”.`;
+  if (it.status === 'error') {
+    const msg = `${it.error} Toque em “Tentar novamente” ou remova o arquivo.`;
     setError(msg);
     announce(msg);
     return;
@@ -358,17 +280,17 @@ async function send() {
 }
 
 async function showResult(id) {
-  const link = `${location.origin}/s.html?id=${id}`;
+  const link = `${location.origin}/p/${id}`;
   try {
     const dataUrl = await QRCode.toDataURL(link, { width: 1024, margin: 2, errorCorrectionLevel: 'M', color: { dark: '#000000', light: '#ffffff' } });
     $('qr').src = dataUrl;
     $('download').href = dataUrl;
     $('download').download = `qrcode-${id}.png`;
   } catch {
-    setError('Os arquivos foram enviados, mas não foi possível gerar o QR code. Use o link abaixo.');
+    setError('O PDF foi enviado, mas não foi possível gerar o QR code. Use o link abaixo.');
   }
-  const done = state.items.filter((it) => it.status === 'done');
-  $('result-sub').textContent = `${plural(done.length, 'arquivo enviado', 'arquivos enviados')} · ${fmt(done.reduce((s, it) => s + it.file.size, 0))}`;
+  const it = state.item;
+  $('result-sub').textContent = `${it.name} · ${fmt(it.file.size)}`;
   $('link').value = link;
   $('open').href = link;
   const canShare = typeof navigator.share === 'function';
@@ -405,7 +327,7 @@ async function copyLink() {
 async function shareLink() {
   const url = $('link').value;
   try {
-    await navigator.share({ title: 'QR-CODE app', text: 'Acesse os arquivos que compartilhei:', url });
+    await navigator.share({ title: 'QR-CODE app', text: 'Acesse o PDF que compartilhei:', url });
   } catch (err) {
     if (err && err.name === 'AbortError') return;
     copyLink();
@@ -434,17 +356,14 @@ drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove
 ['dragover', 'drop'].forEach((t) => window.addEventListener(t, (e) => { if (!drop.contains(e.target)) e.preventDefault(); }));
 
 $('selected').addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-remove]');
-  if (!btn || state.busy) return;
-  const key = Number(btn.dataset.remove);
-  const idx = state.items.findIndex((it) => it.key === key);
-  if (idx < 0) return;
-  const [removed] = state.items.splice(idx, 1);
-  if (!pending().some((it) => it.status === 'error')) setError('');
+  if (!e.target.closest('[data-remove]') || state.busy || !state.item) return;
+  const { name } = state.item;
+  state.item = null;
+  state.id = null;
+  setError('');
   render();
-  announce(`${removed.name} removido.`);
-  const next = $('selected').querySelectorAll('[data-remove]')[Math.min(idx, $('selected').querySelectorAll('[data-remove]').length - 1)];
-  (next || drop).focus();
+  announce(`${name} removido.`);
+  drop.focus();
 });
 
 $('send').addEventListener('click', send);
